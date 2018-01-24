@@ -1,0 +1,24 @@
+{
+  "name": "vue-md-kmh-components",
+  "version": "0.0.1",
+  "description": "Vue Material Design component collection for KMH",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kmhgmbh/vue-md-kmh-components.git"
+  },
+  "keywords": [
+    "vue",
+    "material",
+    "kmh"
+  ],
+  "author": "KMH",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kmhgmbh/vue-md-kmh-components/issues"
+  },
+  "homepage": "https://github.com/kmhgmbh/vue-md-kmh-components#readme"
+}
