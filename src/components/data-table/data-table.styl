@@ -1,0 +1,339 @@
+@import '../../styles/variables'
+
+.data-table
+  display: inline-block
+  width: 100%
+  max-width: 100%
+  overflow: hidden
+
+  th, td
+    *
+      transition: .2s ease !important
+
+  @media (max-width: 600px)
+    .table-header
+      display: none !important
+
+  .inner
+    overflow: auto
+
+  table
+    display: inherhit
+    width: 100%
+    max-width: 100%
+    padding: 0
+    margin: 0
+    border-spacing: 0
+
+    th
+      background: color-yellow
+      color: color-blue
+      align-items: center
+      text-align: left
+      height: 60px
+      padding: 0 10px !important
+      text-overflow: ellipsis
+      white-space: nowrap
+      overflow: hidden
+
+      > .head-content
+        height: 100%
+
+      .headname
+        max-width: 100%
+        display: grid
+        min-width: 30px
+        text-overflow: ellipsis
+        white-space: nowrap
+        overflow: hidden
+
+      .md-layout
+        width: 100%
+        max-width: 100%
+        display: inline-grid
+        grid-template-columns: repeat(3, 1fr)
+        grid-template-columns: 30px minmax(50px, auto) 50px
+
+      .title
+        display: table-caption
+        overflow: hidden
+
+      &.searchMode
+
+        .title
+          font-size: font-size-s
+
+        .md-field
+          padding: 0 !important
+          margin: 0 !important
+          min-height: 24px !important
+          color: color-yellow - 100% !important
+
+          &:after
+            background-color: color-yellow - 100% !important
+
+          label
+            top: 5px !important
+            font-size: font-size-m !important
+            font-weight: 500 !important
+            color: color-yellow - 50% !important
+
+          input
+            background: none !important
+            border: 0px none !important
+            border-bottom: 1px solid color-yellow - 50% !important
+            width: 100% !important
+            outline: 0 !important
+            height: 24px !important
+            min-width: 100px !important
+            font-size: font-size-m !important
+            font-weight: 500 !important
+            color: color-yellow - 100% !important
+
+            &:hover, &:focus
+              color: color-yellow - 100% !important
+
+      &.sortable
+        cursor: pointer
+
+      &:first-child
+        border-radius: 7px 0 0 0
+
+      &:last-child
+        border-radius: 0 7px 0 0
+
+      .md-layout
+        justify-content: space-between
+        flex-wrap: nowrap
+        align-items: center
+
+        .md-icon
+          margin: 0
+          padding: 0
+          height: auto
+          min-height: auto
+          font-size: 20px
+
+          &.right
+            transform: rotate(-90deg)
+            color: color-yellow - 50%
+
+          &.search
+            margin-left: 20px
+            color: color-yellow - 50%
+
+        .headname
+          text-overflow: ellipsis
+          white-space: nowrap
+          overflow: hidden
+          flex: 1
+
+    .table-row
+      background: color-grey + 7%
+      transition: .1s ease
+
+      &:not(.search-row):not(.noHover) td
+        cursor: pointer !important
+
+      &:hover:not(.noHover)
+        background: color-grey - 10%
+
+      &.active td
+        background: color-blue !important
+        color: #fff
+
+      &.noHover, &:not(.active), &:not(.search-row)
+        cursor: default !important
+
+      &.search-row
+        background: color-grey - 7%
+        display: none
+
+        @media (max-width: 600px)
+          display: block
+
+        .search-icon
+          position: absolute
+
+        .md-input-container
+          padding: 0
+
+        label
+          margin-left: 3px
+
+    td
+      min-width: 100px
+      text-align: left
+      text-overflow: ellipsis
+      white-space: nowrap
+      overflow: hidden
+
+      &.noData
+        text-align: center
+        font-weight: 600
+
+      div
+        text-overflow: ellipsis
+        white-space: nowrap
+        overflow: hidden
+        max-width: 100%
+
+      &.hasIcon
+        white-space: nowrap
+        text-align: center
+
+        .md-icon
+          cursor: pointer
+          transition: .1s ease
+          margin: 0 5px
+
+          &:hover:not(.disabled)
+            color: color-orange
+
+          &.disabled
+            color: color-grey - 20%
+            cursor: default
+
+      .highlight
+        background: color-yellow
+
+      .onlyState
+        color: color-grey - 50%
+        text-align: center
+
+        .green
+          color: color-green
+
+        .red
+          color: color-red
+
+        .yellow
+          color: color-yellow
+
+      .md-input-container
+        padding: 0
+        margin: 0
+        height: 30px
+        min-height: 30px
+
+        @media (max-width: 600px)
+          margin: 0 10px
+          max-width: calc(100% - 160px)
+          height: 40px
+          min-height: 40px
+          position: absolute
+          margin-left: 10px !important
+          padding-top: 4px !important
+
+        &:after
+          background-color: transparent
+
+        label
+          margin-top: -16px
+          margin-left: 1px
+
+          @media (max-width: 600px)
+            margin-top: -12px
+            margin-left: 2px
+
+        input
+          max-width: 100% !important
+          width: 100% !important
+          position: absolute
+          padding-left: 2px
+
+        .md-clear-input
+          bottom: -4px
+
+        i
+          margin: 7px auto !important
+
+          @media (max-width: 600px)
+            margin: 10px auto
+
+    th, tr:not(.block) td
+      text-overflow: ellipsis
+      white-space: nowrap
+      overflow: hidden
+
+      @media (max-width: 600px)
+        min-height: 40px
+        max-height: 40px
+
+    th, td
+      padding: 10px
+      border-right: 1px solid #fff
+      border-bottom: 1px solid #fff
+      cursor: default
+      color: color-grey-dark
+
+      .columnHead
+        display: none
+        background: color-yellow
+        width: 100px
+        color: color-blue
+        font-weight: 500
+
+        &.empty
+          color: color-yellow
+
+      @media (max-width: 600px)
+        display: flex
+        width: 100%
+        max-width: 100%
+        padding: 0
+        text-align: left !important
+
+        .md-field
+          padding: 5px !important
+          line-height: 40px
+          height: 40px
+
+          label
+            margin: 0
+            top: 0
+            height: 40px
+            line-height: 40px
+            padding: 5px
+
+          .md-input
+            width: 98%
+            padding: 0
+
+          .md-input-action
+            display: none
+
+        span
+          display: inline-block
+          margin: 0
+
+        > div:not(.micromarket-details), .columnHead
+          display: inline-flex
+          padding: 10px
+          margin: 0
+          text-overflow: ellipsis
+          white-space: nowrap
+          overflow: hidden
+
+          i
+            display: inline-block
+            height: 20px
+            min-height: 20px
+            width: 20px
+            min-width: 20px
+            font-size: 20px
+
+    @media (max-width: 600px)
+      tr:not(.block)
+        display: block
+        background: none !important
+        margin-bottom: 20px
+
+        td
+          background: color-grey
+
+          &:first-child
+            border-radius: 7px 7px 0 0
+
+          &:last-child
+            border-radius: 0 0 7px 7px
