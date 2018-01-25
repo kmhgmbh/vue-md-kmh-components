@@ -6,23 +6,24 @@
       <!-- TABLE HEAD -->
       <tr class="table-header">
         <th v-if="selectable" class="selection-column" :style="dynamicWidth">
-          <mdl-checkbox v-model="selectAllRowsFlag"></mdl-checkbox>
+          <mdl-checkbox
+            @change.native="toggleSelectAllRows()"
+            v-model="selectAllRowsFlag">
+          </mdl-checkbox>
         </th>
-        <th @click="sort(head)" :class="{searchMode: getSearchContainer(id + '_search_container_' + encode(head.key, true)), sortable: !head.keys && sortable}" v-for="head in headData" key="headData" :key="head.name" v-if="(head.keys && icons) || (!head.keys && !ignore(head.key))" :style="dynamicWidth">
+        <th @click="sort(head)" :class="{searchMode: getSearchContainer(id + '_search_container_' + encode(head.key, true)), sortable: !head.keys && sortable}" v-for="head in headData" :key="head.name" v-if="(head.keys && icons) || (!head.keys && !ignore(head.key))" :style="dynamicWidth">
           <div class="head-content md-layout md-alignment-center-center" style="max-width: 100%">
             <md-icon v-if="sortedAsc(head) && sortable" class="no-selection">arrow_drop_down</md-icon>
             <md-icon v-else-if="sortedDesc(head) && sortable" class="no-selection">arrow_drop_up</md-icon>
             <md-icon v-else-if="!head.keys && sortable" class="no-selection right">arrow_drop_down</md-icon>
             <div v-if="!head.keys" class="headname no-selection">
               <div class="title" :title="head.name">{{ head.name }}</div>
-              <transition name="slide-down-ind">
-                <md-field v-if="getSearchContainer(id + '_search_container_' + encode(head.key, true))" :id="id + '_search_container_' + encode(head.key, true)" md-inline>
-                  <label>Suchen...</label>
-                  <div class="md-layout">
-                    <md-input :id="id + '_search_input_' + encode(head.key, true)" @click.native.stop.prevent="" @input="updateSearchColumnFilter($event, head.key)" @propertychange="updateSearchColumnFilter($event, head.key)"></md-input>
-                  </div>
-                </md-field>
-              </transition>
+              <md-field v-if="getSearchContainer(id + '_search_container_' + encode(head.key, true))" :id="id + '_search_container_' + encode(head.key, true)" md-inline>
+                <label>Suchen...</label>
+                <div class="md-layout">
+                  <md-input :id="id + '_search_input_' + encode(head.key, true)" @click.native.stop.prevent="" @input="updateSearchColumnFilter($event, head.key)" @propertychange="updateSearchColumnFilter($event, head.key)"></md-input>
+                </div>
+              </md-field>
             </div>
             <span v-else class="headname no-selection">{{ emptyHead }}</span>
             <md-icon v-if="!getSearchContainer(id + '_search_container_' + encode(head.key, true)) && !head.keys && search" :id="id + '_search_icon_' + encode(head.key, true)" @click.native.stop.prevent="setSearchContainer(id + '_search_container_' + encode(head.key, true))" class="no-selection search">search</md-icon>
@@ -54,8 +55,7 @@
         <!-- ROW -->
         <tr :id="rowId(rowIndex)" class="table-row" :class="{active: isVisibleBlock(rowIndex) && withBlock, noHover: !withBlock}" :style="dynamicWidth">
           <td v-if="selectable" class="selection-column">
-            <mdl-checkbox @click.native="toggleDataRowSelection(row, rowIndex, $event)" v-model="selectedRows" :val="rowIndex"></mdl-checkbox>
-            <!-- <md-checkbox @change="toggleDataRowSelection(row, rowIndex)" v-model="selectedRows[rowIndex]"></md-checkbox> -->
+            <mdl-checkbox @change.native="toggleDataRowSelection(row, rowIndex, $event)" v-model="row.$isSelected" :val="rowIndex"></mdl-checkbox>
           </td>
           <td @click="!column.keys && toggleBlock(rowIndex, row)" v-for="column, columnIndex in headData" :class="{hasIcon: (column.keys && icons)}" :style="dynamicWidth">
 
@@ -100,13 +100,6 @@
         </td>
       </tr>
     </table>
-
-    <!-- TABLE ADD LINE -->
-    <div v-if="Object.keys(addRowButton).length > 0" class="add-row">
-      <md-button class="add" @click.native="addRowButton.action">
-        <md-icon>add</md-icon> {{ addRowButton.label }}
-      </md-button>
-    </div>
   </div>
 
   <!-- TABLE PAGER -->

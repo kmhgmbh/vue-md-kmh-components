@@ -9,58 +9,56 @@ export default {
   mixins: [helper],
 
   props: {
+    // data definition of columns
     headData: {
       type: Array,
-      default: () => {
-        return []
-      }
+      default: () => [],
     },
+    // rows
     data: {
       type: Array,
-      default: () => {
-        return []
-      }
+      default: () => [],
     },
-    ignoreColumns: {
-      type: Array,
-      default: () => {
-        return []
-      }
-    },
-    addRowButton: {
-      type: Object,
-      default: () => {
-        return {}
-      }
-    },
-    search: {
-      type: Boolean,
-      default: true
-    },
-    icons: {
-      type: Boolean,
-      default: true
-    },
-    pager: {
-      type: Boolean,
-      default: true
-    },
-    sortable: {
-      type: Boolean,
-      default: true
-    },
-    selectable: {
-      type: Boolean,
-      default: false
-    },
+    // number of rows per page
     max: {
       type: Number,
-      default: 20
+      default: 20,
     },
+    // activate pagination
+    pager: {
+      type: Boolean,
+      default: true,
+    },
+    // array of column keys to ignore
+    ignoreColumns: {
+      type: Array,
+      default: () => [],
+    },
+    // activate search feature
+    search: {
+      type: Boolean,
+      default: true,
+    },
+    // activate icon feature
+    icons: {
+      type: Boolean,
+      default: true,
+    },
+    // activate sortable columns
+    sortable: {
+      type: Boolean,
+      default: true,
+    },
+    // activate select feature
+    selectable: {
+      type: Boolean,
+      default: false,
+    },
+    // key used by row selection
     selectedRowIndexKey: {
       type: String,
-      default: null
-    }
+      default: null,
+    },
   },
 
   computed: {
@@ -81,7 +79,7 @@ export default {
         return ''
       }
       return {
-        'max-width': parseInt((100 / this.columnCount)) + '%'
+        'max-width': `${parseInt((100 / this.columnCount), 10)}%`,
       }
     },
 
@@ -91,8 +89,7 @@ export default {
 
     shouldPagerBeDisplayed () {
       return this.pager && !this.isFilterActive && this.data.length
-    }
-
+    },
   },
 
   data () {
@@ -111,31 +108,40 @@ export default {
       selectAllRowsFlag: false,
       emptyHead: '...',
       columsToShow: [],
-      isFilterActive: false
+      isFilterActive: false,
     }
   },
 
   created () {
     this.init()
-    this.id = this._uid
-    this.columnCount = this.headData.length
-  },
-
-  watch: {
-    selectAllRowsFlag () {
-      this.selectAllRows()
-    }
   },
 
   methods: {
+    /**
+     * @name init
+     * @description initialize this page
+     * @fires this.pushBreadcrumb
+     * @fires transition
+     */
+    init () {
+      this.extractColumnsToShow()
+      
+      this.id = this._uid
+      this.columnCount = this.headData.length
+
+      this.data = this.data.map((row) => {
+        const newRow = row
+        newRow.$isSelected = false
+        return newRow
+      })
+
+      this.$nextTick(() => {
+        this.show = true
+      })
+    },
 
     noSearchFilter () {
-      for (let column in this.searchColumnFilter) {
-        if (this.searchColumnFilter[column] !== '') {
-          return false
-        }
-      }
-      return true
+      return this.searchColumnFilter.filter(column => column === '').length === 0
     },
 
     /**
@@ -146,17 +152,14 @@ export default {
     lensColor (columnMeta, value) {
       let color = ''
       if (columnMeta.stateMapping) {
-        const index = value + '' // Stringify
+        const index = `${value}`
         if (columnMeta.stateMapping[index]) {
           color = columnMeta.stateMapping[index]
         }
-      } else {
-        // Fallback for old onlyState usage
-        if (value === 1) {
+      } else if (value === 1) {
           color = 'yellow'
-        } else if (value === 2) {
+      } else if (value === 2) {
           color = 'green'
-        }
       }
       return color
     },
@@ -169,9 +172,8 @@ export default {
      * @fires this.linkCustom
      * @fires this.setSidebar
      */
-
     generateAndExecuteLink (path, rowData) {
-      var newPath = path
+      const newPath = path
       for (let keyIndex in path.params) {
         let key = path.params[keyIndex]
         let value = ''
@@ -205,30 +207,14 @@ export default {
         meta.action(rowData)
       } else if (meta.link) {
         this.generateAndExecuteLink(meta.link, rowData)
-      } else {
-        console.warn('CTA can\'t be executed', meta)
       }
-    },
-
-    /**
-     * @name init
-     * @description initialize this page
-     * @fires this.pushBreadcrumb
-     * @fires transition
-     */
-    init () {
-      this.extractColumnsToShow()
-
-      this.$nextTick(() => {
-        this.show = true
-      })
     },
 
     /**
      * Extract column names which should appear in table
      */
     extractColumnsToShow () {
-      this.headData.forEach(item => {
+      this.headData.forEach((item) => {
         if (item.key) {
           this.columsToShow.push(item.key)
         }
@@ -247,10 +233,9 @@ export default {
 
     rowId (index) {
       if (this.data && this.data[0]) {
-        return this.data[0].constructor.name + '-' + index
-      } else {
-        return 'row-' + index
+        return `${this.data[0].constructor.name}-${index}`
       }
+      return `row-${index}`
     },
 
     /**
@@ -291,12 +276,12 @@ export default {
      * @return {Boolean}
      */
     isOnlyState (index) {
-      for (let column of this.headData) {
+      this.headData.reduce((onlyState, column) => {
         if (column.key === index && column.onlyState) {
           return column.onlyState
         }
-      }
-      return false
+        return onlyState
+      }, false)
     },
 
     /**
@@ -307,9 +292,8 @@ export default {
     isActionActive (meta, row) {
       if (meta.isActive) {
         return meta.isActive(row)
-      } else {
-        return meta.link !== ''
       }
+      return meta.link !== ''
     },
 
     /**
@@ -320,14 +304,16 @@ export default {
     isActionHidden (meta, row) {
       if (meta.isHidden) {
         return meta.isHidden(row)
-      } else {
-        return false
       }
+      return false
     },
 
-    columnFilterMatched (row) {
+    columnFilterMatched(row) {
       for (let column in this.searchColumnFilter) {
-        if (row[column].toString().toLowerCase().indexOf(this.searchColumnFilter[column].toLowerCase()) < 0) {
+        if (row[column]
+            .toString()
+            .toLowerCase()
+            .indexOf(this.searchColumnFilter[column].toLowerCase()) < 0) {
           return false
         }
       }
@@ -358,33 +344,32 @@ export default {
       }
     },
 
-    selectAllRows () {
-      let selectedRowsAll = []
-      this.selectedRowsByIndexKey = []
-      if (this.selectAllRowsFlag) {
-        for (let row in this.data) {
-          selectedRowsAll.push(parseInt(row))
-          if (this.selectedRowIndexKey) {
-            this.selectedRowsByIndexKey.push(this.data[row][this.selectedRowIndexKey])
-          }
-        }
-        this.selectedRows = selectedRowsAll
-      } else {
-        this.selectedRows = []
-      }
+    toggleSelectAllRows () {
+      this.data = this.data.map((row) => {
+        const newRow = row
+        newRow.$isSelected = this.selectAllRowsFlag
+        return newRow
+      })
+      this.selectedRowsByIndexKey = this.getAllSelectedRows()
+      this.$emit('rowSelectionChange', this.selectedRowsByIndexKey)
     },
 
-    toggleDataRowSelection (rowData, index, event) {
+    getAllSelectedRows () {
+      return this.data.reduce((acc, row) => {
+        if (row.$isSelected) {
+          acc.push(row[this.selectedRowIndexKey])
+        }
+        return acc
+      }, [])
+    },
+
+    toggleDataRowSelection () {
       this.selectAllRowsFlag = false
       // this.SelectedRows will be handled by checkbox
-      if (event.target.type === 'checkbox' && this.selectedRowIndexKey) {
-        const indexKey = rowData[this.selectedRowIndexKey]
-        const keyIndex = this.selectedRowsByIndexKey.indexOf(indexKey)
-        if (keyIndex >= 0) {
-          this.selectedRowsByIndexKey.splice(keyIndex, 1)
-        } else {
-          this.selectedRowsByIndexKey.push(indexKey)
-        }
+
+      if (this.selectedRowIndexKey) {
+        this.selectedRowsByIndexKey = this.getAllSelectedRows()
+        this.$emit('rowSelectionChange', this.selectedRowsByIndexKey)
       }
     },
 
@@ -394,7 +379,11 @@ export default {
         if (pattern !== '') {
           const index = text.toString().toLowerCase().indexOf(pattern.toLowerCase())
           if (index >= 0) {
-            return text.toString().substring(0, index) + '<span class="highlight">' + text.substring(index, index + pattern.length) + '</span>' + text.substring(index + pattern.length)
+            return `${text.toString().substring(0, index)}
+              <span class="highlight">
+              ${text.substring(index, index + pattern.length)}
+              </span>
+              ${text.substring(index + pattern.length)}`
           }
         }
       }
@@ -459,30 +448,38 @@ export default {
     },
 
     sortData (key, sort) {
-      var sortOrder = 1
+      let sortOrder = 1
       if (sort === 'DESC') {
         sortOrder = -1
       }
-      return function (a, b) {
-        const valueA = typeof a[key] === 'string' && a[key].match(/^[\d]+[.|,]?[\d]+?$/) ? parseFloat(a[key]) : a[key]
-        const valueB = typeof b[key] === 'string' && b[key].match(/^[\d]+[.|,]?[\d]+?$/) ? parseFloat(b[key]) : b[key]
+      return (a, b) => {
+        const valueA = typeof a[key] === 'string' && a[key].match(/^[\d]+[.|,]?[\d]+?$/)
+                     ? parseFloat(a[key])
+                     : a[key]
 
-        var result = (valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0
+        const valueB = typeof b[key] === 'string' && b[key].match(/^[\d]+[.|,]?[\d]+?$/)
+                     ? parseFloat(b[key])
+                     : b[key]
+
+        const result = (valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0
         return result * sortOrder
       }
     },
 
     getAncestor (node, tagName) {
-      tagName = tagName.toUpperCase()
-      while (node) {
-        if (node.nodeType === 1 && node.nodeName === tagName) {
-          return node
+      const tagNameUpper = tagName.toUpperCase()
+      let traversingNode = node
+
+      while (traversingNode) {
+        if (traversingNode.nodeType === 1 && traversingNode.nodeName === tagNameUpper) {
+          return traversingNode
         }
-        node = node.parentNode
+        traversingNode = traversingNode.parentNode
       }
+
       return null
-    }
-  }
+    },
+  },
 }
 </script>
 
