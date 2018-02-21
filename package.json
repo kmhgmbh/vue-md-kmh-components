@@ -27,6 +27,8 @@
     "babel-loader": "^7.1.2",
     "babel-preset-es2015": "^6.24.1",
     "css-loader": "^0.28.9",
+    "es6-promise": "^4.2.4",
+    "moment": "^2.20.1",
     "path": "^0.12.7",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",

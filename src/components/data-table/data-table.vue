@@ -2,6 +2,7 @@
 
 <script>
 import helper from './../../mixins/helper.vue'
+import moment from 'moment'
 
 export default {
   name: 'data-table',
@@ -373,7 +374,10 @@ export default {
       }
     },
 
-    highlight (column, text) {
+    highlight (column, incomingText) {
+      let text = typeof incomingText === 'object'
+        ? this.resolveValue(incomingText)
+        : incomingText
       if (this.searchColumnFilter[column] != null) {
         const pattern = this.searchColumnFilter[column]
         if (pattern !== '') {
@@ -388,6 +392,16 @@ export default {
         }
       }
       return text
+    },
+
+    resolveValue (obj) {
+      if (obj.type) {
+        switch (obj.type) {
+          case 'date':
+            return obj.format ? moment(obj.value).format(obj.format) : moment(obj.value).format('YYYY-MM-DD')
+        }
+      }
+      return obj.value
     },
 
     updateSearchColumnFilter (input, column) {
