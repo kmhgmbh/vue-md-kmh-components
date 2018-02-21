@@ -75,11 +75,11 @@
               <md-icon :class="lensColor(column, row[column.key])">lens</md-icon>
             </div>
             <!-- Format output -->
-            <div v-else-if="column.format">
+            <div v-else-if="column.format && typeof column.format === 'function'">
               {{column.format(row[column.key])}}
             </div>
             <!-- Display data -->
-            <div v-else v-html="highlight(column.key, row[column.key])"></div>
+            <div v-else v-html="highlight(column.key, column, row[column.key])"></div>
           </td>
         </tr>
 

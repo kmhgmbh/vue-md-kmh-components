@@ -374,12 +374,12 @@ export default {
       }
     },
 
-    highlight (column, incomingText) {
-      let text = typeof incomingText === 'object'
-        ? this.resolveValue(incomingText)
-        : incomingText
-      if (this.searchColumnFilter[column] != null) {
-        const pattern = this.searchColumnFilter[column]
+    highlight (key, column, text) {
+      text = column.type
+        ? this.resolveValue(column, text)
+        : text
+      if (this.searchColumnFilter[key] != null) {
+        const pattern = this.searchColumnFilter[key]
         if (pattern !== '') {
           const index = text.toString().toLowerCase().indexOf(pattern.toLowerCase())
           if (index >= 0) {
@@ -394,14 +394,14 @@ export default {
       return text
     },
 
-    resolveValue (obj) {
-      if (obj.type) {
-        switch (obj.type) {
+    resolveValue (column, text) {
+      if (column.type) {
+        switch (column.type) {
           case 'date':
-            return obj.format ? moment(obj.value).format(obj.format) : moment(obj.value).format('YYYY-MM-DD')
+            return column.format ? moment(text).format(column.format) : moment(text).format('YYYY-MM-DD')
         }
       }
-      return obj.value
+      return text
     },
 
     updateSearchColumnFilter (input, column) {
