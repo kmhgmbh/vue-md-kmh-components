@@ -79,7 +79,7 @@
               {{column.format(row[column.key])}}
             </div>
             <!-- Display data -->
-            <div v-else v-html="highlight(column.key, column, row[column.key])"></div>
+            <div v-else v-html="highlight(column, row[column.key])"></div>
           </td>
         </tr>
 

@@ -1,6 +1,7 @@
 <template src="./data-table.html"></template>
 
 <script>
+import Vue from 'vue'
 import helper from './../../mixins/helper.vue'
 import moment from 'moment'
 
@@ -157,10 +158,8 @@ export default {
         if (columnMeta.stateMapping[index]) {
           color = columnMeta.stateMapping[index]
         }
-      } else if (value === 1) {
-          color = 'yellow'
-      } else if (value === 2) {
-          color = 'green'
+      } else {
+        color = Boolean(value) ? 'green' : 'red'
       }
       return color
     },
@@ -374,7 +373,8 @@ export default {
       }
     },
 
-    highlight (key, column, text) {
+    highlight (column, text) {
+      const key = column.key
       text = column.type
         ? this.resolveValue(column, text)
         : text
