@@ -2,13 +2,10 @@
 
 <script>
 import Vue from 'vue'
-import helper from './../../mixins/helper.vue'
 import moment from 'moment'
 
 export default {
   name: 'data-table',
-
-  mixins: [helper],
 
   props: {
     // data definition of columns
@@ -492,6 +489,28 @@ export default {
       }
 
       return null
+    },
+
+    encode (value, noHyphen) {
+      if (!value) {
+        return ''
+      }
+      value += '' // Convert integer
+      value = value.toLowerCase()
+      value = value.replace('.', '')
+      value = value.replace(/Ä/g, 'Ae')
+      value = value.replace(/ä/g, 'ae')
+      value = value.replace(/Ö/g, 'Oe')
+      value = value.replace(/ö/g, 'oe')
+      value = value.replace(/Ü/g, 'Ue')
+      value = value.replace(/ü/g, 'ue')
+      value = value.replace(/ß/g, 'ss')
+      value = value.replace(' ', '-')
+      value = value.replace(/[^a-z0-9-_]/gi, '')
+      if (noHyphen && noHyphen === true) {
+        value = value.replace('-', '_')
+      }
+      return value
     },
   },
 }
