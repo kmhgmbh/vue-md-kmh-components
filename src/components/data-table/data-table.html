@@ -6,10 +6,10 @@
       <!-- TABLE HEAD -->
       <tr class="table-header">
         <th v-if="selectable" class="selection-column" :style="dynamicWidth">
-          <mdl-checkbox
+          <md-checkbox
             @change.native="toggleSelectAllRows()"
             v-model="selectAllRowsFlag">
-          </mdl-checkbox>
+          </md-checkbox>
         </th>
         <th @click="sort(head)" :class="{searchMode: getSearchContainer(id + '_search_container_' + encode(head.key, true)), sortable: !head.keys && sortable}" v-for="head in headData" :key="head.name" v-if="(head.keys && icons) || (!head.keys && !ignore(head.key))" :style="dynamicWidth">
           <div class="head-content md-layout md-alignment-center-center" style="max-width: 100%">
@@ -55,7 +55,7 @@
         <!-- ROW -->
         <tr :id="rowId(rowIndex)" class="table-row" :class="{active: isVisibleBlock(rowIndex) && withBlock, noHover: !withBlock}" :style="dynamicWidth">
           <td v-if="selectable" class="selection-column">
-            <mdl-checkbox @change.native="toggleDataRowSelection(row, rowIndex, $event)" v-model="row.$isSelected" :val="rowIndex"></mdl-checkbox>
+            <md-checkbox @change.native="toggleDataRowSelection(row, rowIndex, $event)" v-model="row.$isSelected" :val="rowIndex"></md-checkbox>
           </td>
           <td @click="!column.keys && toggleBlock(rowIndex, row)" v-for="column, columnIndex in headData" :class="{hasIcon: (column.keys && icons)}" :style="dynamicWidth">
 
@@ -93,7 +93,7 @@
         </transition>
 
       </template>
-      
+
       <tr v-if="data.length === 0">
         <td colspan="100%" class="noData">
           Keine Daten verfügbar
