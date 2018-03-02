@@ -38,7 +38,17 @@ module.exports = {
       },
       {
         test: /\.vue$/,
-        loader: 'vue-loader'
+        loader: 'vue-loader',
+        options: {
+            loaders: {
+                js: {
+                   loader: 'babel-loader',
+                   options: {
+                       presets: ['es2015']
+                   }
+                },
+            }
+        }
       },
       {
         test: /\.css$/,
