@@ -63,8 +63,8 @@ export default {
   computed: {
     pages () {
       let length = 1
-      if (this.data.length) {
-        length = this.data.length / this.max
+      if (this.rowData.length) {
+        length = this.rowData.length / this.max
         if (length < 1) {
           length = 1
         }
@@ -87,7 +87,7 @@ export default {
     },
 
     shouldPagerBeDisplayed () {
-      return this.pager && !this.isFilterActive && this.data.length
+      return this.pager && !this.isFilterActive && this.rowData.length
     },
   },
 
@@ -95,6 +95,7 @@ export default {
     return {
       id: -1,
       show: false,
+      rowData: null,
       searchContainer: [],
       searchColumnFilter: [],
       sortedColumns: [],
@@ -112,6 +113,7 @@ export default {
   },
 
   created () {
+    this.rowData = this.data
     this.init()
   },
 
@@ -128,7 +130,7 @@ export default {
       this.id = this._uid
       this.columnCount = this.headData.length
 
-      this.data = this.data.map((row) => {
+      this.rowData = this.rowData.map((row) => {
         const newRow = row
         newRow.$isSelected = false
         return newRow
@@ -188,7 +190,7 @@ export default {
 
     getIconName (icon, index) {
       if (typeof icon === 'function') {
-        return icon(this.data[index])
+        return icon(this.rowData[index])
       }
       return icon
     },
@@ -229,8 +231,8 @@ export default {
     },
 
     rowId (index) {
-      if (this.data && this.data[0]) {
-        return `${this.data[0].constructor.name}-${index}`
+      if (this.rowData && this.rowData[0]) {
+        return `${this.rowData[0].constructor.name}-${index}`
       }
       return `row-${index}`
     },
@@ -342,7 +344,7 @@ export default {
     },
 
     toggleSelectAllRows () {
-      this.data = this.data.map((row) => {
+      this.rowData = this.rowData.map((row) => {
         const newRow = row
         newRow.$isSelected = this.selectAllRowsFlag
         return newRow
@@ -351,8 +353,12 @@ export default {
       this.$emit('rowSelectionChange', this.selectedRowsByIndexKey)
     },
 
+    rowClicked (e) {
+      this.$emit('rowClicked', e)
+    },
+
     getAllSelectedRows () {
-      return this.data.reduce((acc, row) => {
+      return this.rowData.reduce((acc, row) => {
         if (row.$isSelected) {
           acc.push(row[this.selectedRowIndexKey])
         }
@@ -451,7 +457,7 @@ export default {
           this.sortedColumns[head.key] = 'ASC'
         }
         if (this.sortedColumns[head.key] !== null) {
-          this.sortedData = this.data
+          this.sortedData = this.rowData
           this.sortedData.sort(this.sortData(head.key, this.sortedColumns[head.key]))
         }
         this.$forceUpdate()

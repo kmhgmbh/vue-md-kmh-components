@@ -53,7 +53,7 @@
       <template v-for="row, rowIndex in (sortedData.length === 0 ? data : sortedData)" v-if="columnFilterMatched(row) && rowOnCurrentPage(rowIndex)">
 
         <!-- ROW -->
-        <tr :id="rowId(rowIndex)" class="table-row" :class="{active: isVisibleBlock(rowIndex) && withBlock, noHover: !withBlock}" :style="dynamicWidth">
+        <tr :id="rowId(rowIndex)" class="table-row" :class="{active: isVisibleBlock(rowIndex) && withBlock, noHover: !withBlock}" @click.prevent="rowClicked(row)" :style="dynamicWidth">
           <td v-if="selectable" class="selection-column">
             <mdl-checkbox @change.native="toggleDataRowSelection(row, rowIndex, $event)" v-model="row.$isSelected" :val="rowIndex"></mdl-checkbox>
           </td>
