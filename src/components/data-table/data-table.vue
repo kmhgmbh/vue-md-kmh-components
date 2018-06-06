@@ -1,12 +1,11 @@
 <template src="./data-table.html"></template>
 
 <script>
-import helper from './../../mixins/helper.vue'
+import Vue from 'vue'
+import moment from 'moment'
 
 export default {
   name: 'data-table',
-
-  mixins: [helper],
 
   props: {
     // data definition of columns
@@ -64,8 +63,8 @@ export default {
   computed: {
     pages () {
       let length = 1
-      if (this.data.length) {
-        length = this.data.length / this.max
+      if (this.rowData.length) {
+        length = this.rowData.length / this.max
         if (length < 1) {
           length = 1
         }
@@ -88,7 +87,7 @@ export default {
     },
 
     shouldPagerBeDisplayed () {
-      return this.pager && !this.isFilterActive && this.data.length
+      return this.pager && !this.isFilterActive && this.rowData.length
     },
   },
 
@@ -96,6 +95,7 @@ export default {
     return {
       id: -1,
       show: false,
+      rowData: null,
       searchContainer: [],
       searchColumnFilter: [],
       sortedColumns: [],
@@ -113,6 +113,7 @@ export default {
   },
 
   created () {
+    this.rowData = this.data
     this.init()
   },
 
@@ -129,7 +130,7 @@ export default {
       this.id = this._uid
       this.columnCount = this.headData.length
 
-      this.data = this.data.map((row) => {
+      this.rowData = this.rowData.map((row) => {
         const newRow = row
         newRow.$isSelected = false
         return newRow
@@ -156,10 +157,8 @@ export default {
         if (columnMeta.stateMapping[index]) {
           color = columnMeta.stateMapping[index]
         }
-      } else if (value === 1) {
-          color = 'yellow'
-      } else if (value === 2) {
-          color = 'green'
+      } else {
+        color = Boolean(value) ? 'green' : 'red'
       }
       return color
     },
@@ -191,7 +190,7 @@ export default {
 
     getIconName (icon, index) {
       if (typeof icon === 'function') {
-        return icon(this.data[index])
+        return icon(this.rowData[index])
       }
       return icon
     },
@@ -232,8 +231,8 @@ export default {
     },
 
     rowId (index) {
-      if (this.data && this.data[0]) {
-        return `${this.data[0].constructor.name}-${index}`
+      if (this.rowData && this.rowData[0]) {
+        return `${this.rowData[0].constructor.name}-${index}`
       }
       return `row-${index}`
     },
@@ -345,7 +344,7 @@ export default {
     },
 
     toggleSelectAllRows () {
-      this.data = this.data.map((row) => {
+      this.rowData = this.rowData.map((row) => {
         const newRow = row
         newRow.$isSelected = this.selectAllRowsFlag
         return newRow
@@ -354,8 +353,12 @@ export default {
       this.$emit('rowSelectionChange', this.selectedRowsByIndexKey)
     },
 
+    rowClicked (e) {
+      this.$emit('rowClicked', e)
+    },
+
     getAllSelectedRows () {
-      return this.data.reduce((acc, row) => {
+      return this.rowData.reduce((acc, row) => {
         if (row.$isSelected) {
           acc.push(row[this.selectedRowIndexKey])
         }
@@ -374,8 +377,12 @@ export default {
     },
 
     highlight (column, text) {
-      if (this.searchColumnFilter[column] != null) {
-        const pattern = this.searchColumnFilter[column]
+      const key = column.key
+      text = column.type
+        ? this.resolveValue(column, text)
+        : text
+      if (this.searchColumnFilter[key] != null) {
+        const pattern = this.searchColumnFilter[key]
         if (pattern !== '') {
           const index = text.toString().toLowerCase().indexOf(pattern.toLowerCase())
           if (index >= 0) {
@@ -385,6 +392,16 @@ export default {
               </span>
               ${text.substring(index + pattern.length)}`
           }
+        }
+      }
+      return text
+    },
+
+    resolveValue (column, text) {
+      if (column.type) {
+        switch (column.type) {
+          case 'date':
+            return column.format ? moment(text).format(column.format) : moment(text).format('YYYY-MM-DD')
         }
       }
       return text
@@ -440,7 +457,7 @@ export default {
           this.sortedColumns[head.key] = 'ASC'
         }
         if (this.sortedColumns[head.key] !== null) {
-          this.sortedData = this.data
+          this.sortedData = this.rowData
           this.sortedData.sort(this.sortData(head.key, this.sortedColumns[head.key]))
         }
         this.$forceUpdate()
@@ -478,6 +495,28 @@ export default {
       }
 
       return null
+    },
+
+    encode (value, noHyphen) {
+      if (!value) {
+        return ''
+      }
+      value += '' // Convert integer
+      value = value.toLowerCase()
+      value = value.replace('.', '')
+      value = value.replace(/Ä/g, 'Ae')
+      value = value.replace(/ä/g, 'ae')
+      value = value.replace(/Ö/g, 'Oe')
+      value = value.replace(/ö/g, 'oe')
+      value = value.replace(/Ü/g, 'Ue')
+      value = value.replace(/ü/g, 'ue')
+      value = value.replace(/ß/g, 'ss')
+      value = value.replace(' ', '-')
+      value = value.replace(/[^a-z0-9-_]/gi, '')
+      if (noHyphen && noHyphen === true) {
+        value = value.replace('-', '_')
+      }
+      return value
     },
   },
 }

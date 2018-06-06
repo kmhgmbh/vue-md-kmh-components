@@ -14,7 +14,8 @@ module.exports = {
   },
   externals: {
     'Vue': 'vue',
-    'vue-material': 'vue-material'
+    'vue-material': 'vue-material',
+    'moment': 'moment'
   },
   module: {
     loaders: [
