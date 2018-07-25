@@ -88,7 +88,7 @@ export default {
     },
 
     shouldPagerBeDisplayed () {
-      return this.pager && !this.isFilterActive && this.data.length
+      return this.pager && this.data.length
     },
   },
 
@@ -340,8 +340,6 @@ export default {
       this.allRows = this.searchedAndOrderedRows(rowsClone);
       this.updatePagesToShow();
     },
-
-
 
     /**
      * Get lens color for states based on meta information
@@ -644,7 +642,8 @@ export default {
       }
 
       this.isFilterActive = Object.keys(this.searchColumnFilter).length > 0;
-      this.pageRows(this.page - 1);
+
+      this.pageRows(0);
     },
 
     clearSearchContainer(id, column) {
