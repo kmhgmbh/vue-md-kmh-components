@@ -164,3 +164,4 @@ export default {
   },
 };
 </script>
+<style lang="sass" src="./styles/theme.sass"></style>

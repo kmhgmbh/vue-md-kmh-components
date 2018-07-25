@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import VueMaterial from 'vue-material';
-import VueMdl from 'vue-mdl';
 import Main from './main';
 
 import VueMq from 'vue-mq'
@@ -16,11 +15,6 @@ Vue.use(VueMq, {
     lg: Infinity,
   }
 });
-
-require('material-design-lite/material.min.js');
-require('material-design-lite/material.min.css');
-
-Vue.use(VueMdl);
 
 /* eslint-disable no-new */
 new Vue({
