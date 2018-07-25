@@ -299,18 +299,18 @@ export default {
     searchedRows(rows) {
       if (this.isFilterActive) {
         return rows.filter((row) => {
-          let found = false;
-          Object.keys(row).forEach((key) => {
+          return Object.keys(row).reduce((acc, key) => {
             if (this.searchColumnFilter[key]) {
               /* eslint-disable */
               let convertedWildcards = this.searchColumnFilter[key].replace('*', '[\\d\\w]*');
               convertedWildcards = convertedWildcards.replace('?', '[\\d\\w]');
               /* eslint-enable */
               const regex = new RegExp(convertedWildcards, 'i');
-              if (regex.test(row[key])) found = true;
+              return regex.test(row[key]) && acc;
+            } else {
+              return acc
             }
-          });
-          return found;
+          }, true);
         });
       }
       return rows;
