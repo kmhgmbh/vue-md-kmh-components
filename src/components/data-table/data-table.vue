@@ -276,14 +276,19 @@ export default {
         let valueA = a[actualSortSettings.column];
         let valueB = b[actualSortSettings.column];
 
-        if (parseInt(a[actualSortSettings.column], 10)
-          && parseInt(b[actualSortSettings.column], 10)) {
-          valueA = parseInt(a[actualSortSettings.column], 10);
-          valueB = parseInt(b[actualSortSettings.column], 10);
+        if (moment(valueA, 'DD.MM.YYYY').isValid() && moment(valueB, 'DD.MM.YYYY').isValid()) {
+          valueA = moment(valueA, 'DD.MM.YYYY').format('YYYY-MM-DD');
+          valueB = moment(valueB, 'DD.MM.YYYY').format('YYYY-MM-DD');
+        } else if (parseInt(valueA, 10)
+          && parseInt(valueB, 10)) {
+          valueA = parseInt(valueA, 10);
+          valueB = parseInt(valueB, 10);
         } else {
           valueA = a[actualSortSettings.column].toString().toUpperCase();
           valueB = b[actualSortSettings.column].toString().toUpperCase();
         }
+
+        console.log(valueA, parseInt(valueA, 10));
 
         if (valueA < valueB) {
           return sortReturnLower;
@@ -688,25 +693,6 @@ export default {
         this.sortDesc(head.key);
       }
       this.pageRows(this.page - 1);
-    },
-
-    sortData (key, sort) {
-      let sortOrder = 1
-      if (sort === 'DESC') {
-        sortOrder = -1
-      }
-      return (a, b) => {
-        const valueA = typeof a[key] === 'string' && a[key].match(/^[\d]+[.|,]?[\d]+?$/)
-                     ? parseFloat(a[key])
-                     : a[key]
-
-        const valueB = typeof b[key] === 'string' && b[key].match(/^[\d]+[.|,]?[\d]+?$/)
-                     ? parseFloat(b[key])
-                     : b[key]
-
-        const result = (valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0
-        return result * sortOrder
-      }
     },
 
     getAncestor (node, tagName) {

@@ -41,6 +41,7 @@
 
 <script>
 import Faker from 'faker';
+import moment from 'moment';
 
 import VueDatatable from './components/data-table/data-table';
 
@@ -92,6 +93,9 @@ export default {
             return '';
           },
         }, {
+          key: 'discoveryDate',
+          name: 'Discovery Date',
+        }, {
           key: 'extinct',
           onlyState: true,
         }, {
@@ -138,6 +142,7 @@ export default {
           id: `${i}`,
           name: Faker.name.firstName(),
           variety: varieties[Math.floor(Math.random() * 5)],
+          discoveryDate: this.randomDate(),
           size: Math.floor((Math.random() * 1000) + 1),
           extinct: Math.floor((Math.random() * 3) - 1),
           wingCount: 2,
@@ -145,6 +150,13 @@ export default {
       }
 
       this.birds = birdsBefore.concat(newBirds);
+    },
+
+    randomDate() {
+      const start = new Date(1800,1,1);
+      const end = new Date();
+      const randomDate = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+      return moment(randomDate).format('DD.MM.YYYY');
     },
 
     generateRandomData() {
@@ -155,6 +167,7 @@ export default {
           id: `${i}`,
           name: Faker.name.firstName(),
           variety: varieties[Math.floor(Math.random() * 5)],
+          discoveryDate: this.randomDate(),
           size: Math.floor((Math.random() * 1000) + 1),
           extinct: Math.floor((Math.random() * 3) - 1),
           wingCount: 2,
