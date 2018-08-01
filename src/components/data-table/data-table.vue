@@ -286,11 +286,14 @@ export default {
           && parseInt(valueB, 10)) {
           valueA = parseInt(valueA, 10);
           valueB = parseInt(valueB, 10);
+        } else if (parseFloat(valueA) && parseFloat(valueB)) {
+          valueA = parseFloat(valueA);
+          valueB = parseFloat(valueB);
         } else {
-          valueA = a[actualSortSettings.column].toString().toUpperCase();
-          valueB = b[actualSortSettings.column].toString().toUpperCase();
+          valueA = valueA.toString().toUpperCase();
+          valueB = valueB.toString().toUpperCase();
         }
-        
+
         if (valueA < valueB) {
           return sortReturnLower;
         }
