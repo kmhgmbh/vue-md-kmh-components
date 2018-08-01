@@ -101,6 +101,9 @@ export default {
         }, {
           key: 'wingCount',
           name: 'Number of wings',
+        }, {
+          key: 'maxAge',
+          name: 'Average max age',
         }, /* {
           keys: [
             {
@@ -146,6 +149,7 @@ export default {
           size: Math.floor((Math.random() * 1000) + 1),
           extinct: Math.floor((Math.random() * 3) - 1),
           wingCount: 2,
+          maxAge: (Math.random() * 40).toFixed(2),
         });
       }
 
@@ -171,6 +175,7 @@ export default {
           size: Math.floor((Math.random() * 1000) + 1),
           extinct: Math.floor((Math.random() * 3) - 1),
           wingCount: 2,
+          maxAge: (Math.random() * 40).toFixed(2),
         });
       }
     },

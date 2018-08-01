@@ -282,13 +282,13 @@ export default {
         if (dateA.isValid() && dateB.isValid()) {
           valueA = dateA.format('YYYY-MM-DD');
           valueB = dateB.format('YYYY-MM-DD');
+        } else if (parseFloat(valueA) && parseFloat(valueB)) {
+          valueA = parseFloat(valueA);
+          valueB = parseFloat(valueB);
         } else if (parseInt(valueA, 10)
           && parseInt(valueB, 10)) {
           valueA = parseInt(valueA, 10);
           valueB = parseInt(valueB, 10);
-        } else if (parseFloat(valueA) && parseFloat(valueB)) {
-          valueA = parseFloat(valueA);
-          valueB = parseFloat(valueB);
         } else {
           valueA = valueA.toString().toUpperCase();
           valueB = valueB.toString().toUpperCase();
