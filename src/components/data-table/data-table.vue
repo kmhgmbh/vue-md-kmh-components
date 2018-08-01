@@ -276,12 +276,13 @@ export default {
         let valueA = a[actualSortSettings.column];
         let valueB = b[actualSortSettings.column];
 
-        const dateA = moment(valueA, 'DD.MM.YYYY');
-        const dateB = moment(valueB, 'DD.MM.YYYY');
+        const dateRegExp = /[0-3]{1}[0-9]{1}\.[0-1]{1}[0-9]{1}\.[0-9]{4}/;
 
-        if (dateA.isValid() && dateB.isValid()) {
-          valueA = dateA.format('YYYY-MM-DD');
-          valueB = dateB.format('YYYY-MM-DD');
+        const isDate = dateRegExp.test(valueA) && dateRegExp.test(valueB);
+        
+        if (isDate) {
+          valueA = moment(valueA, 'DD.MM.YYYY').format('YYYY-MM-DD');
+          valueB = moment(valueB, 'DD.MM.YYYY').format('YYYY-MM-DD');
         } else if (parseFloat(valueA) && parseFloat(valueB)) {
           valueA = parseFloat(valueA);
           valueB = parseFloat(valueB);
