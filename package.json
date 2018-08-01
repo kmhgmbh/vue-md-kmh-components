@@ -1,6 +1,6 @@
 {
   "name": "vue-md-kmh-components",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Vue Material Design component collection for KMH",
   "main": "dist/vue-md-kmh-components.min.js",
   "scripts": {
@@ -22,8 +22,7 @@
     "url": "https://github.com/kmhgmbh/vue-md-kmh-components/issues"
   },
   "homepage": "https://github.com/kmhgmbh/vue-md-kmh-components#readme",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-stage-2": "^6.24.1",
