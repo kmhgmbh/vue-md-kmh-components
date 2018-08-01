@@ -1,6 +1,6 @@
 {
   "name": "vue-md-kmh-components",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "Vue Material Design component collection for KMH",
   "main": "dist/vue-md-kmh-components.min.js",
   "scripts": {
