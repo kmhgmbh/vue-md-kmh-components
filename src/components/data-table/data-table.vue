@@ -276,9 +276,12 @@ export default {
         let valueA = a[actualSortSettings.column];
         let valueB = b[actualSortSettings.column];
 
-        if (moment(valueA, 'DD.MM.YYYY').isValid() && moment(valueB, 'DD.MM.YYYY').isValid()) {
-          valueA = moment(valueA, 'DD.MM.YYYY').format('YYYY-MM-DD');
-          valueB = moment(valueB, 'DD.MM.YYYY').format('YYYY-MM-DD');
+        const dateA = moment(valueA, 'DD.MM.YYYY');
+        const dateB = moment(valueB, 'DD.MM.YYYY');
+
+        if (dateA.isValid() && dateB.isValid()) {
+          valueA = dateA.format('YYYY-MM-DD');
+          valueB = dateB.format('YYYY-MM-DD');
         } else if (parseInt(valueA, 10)
           && parseInt(valueB, 10)) {
           valueA = parseInt(valueA, 10);
@@ -287,9 +290,7 @@ export default {
           valueA = a[actualSortSettings.column].toString().toUpperCase();
           valueB = b[actualSortSettings.column].toString().toUpperCase();
         }
-
-        console.log(valueA, parseInt(valueA, 10));
-
+        
         if (valueA < valueB) {
           return sortReturnLower;
         }
