@@ -279,7 +279,7 @@ export default {
         const dateRegExp = /[0-3]{1}[0-9]{1}\.[0-1]{1}[0-9]{1}\.[0-9]{4}/;
 
         const isDate = dateRegExp.test(valueA) && dateRegExp.test(valueB);
-        
+
         if (isDate) {
           valueA = moment(valueA, 'DD.MM.YYYY').format('YYYY-MM-DD');
           valueB = moment(valueB, 'DD.MM.YYYY').format('YYYY-MM-DD');
@@ -550,18 +550,6 @@ export default {
         return false
       }
       return true
-    },
-
-    pagerPrev () {
-      if (this.page > 1) {
-        this.page--
-      }
-    },
-
-    pagerNext () {
-      if (this.page < this.pages) {
-        this.page++
-      }
     },
 
     toggleSelectAllRows() {
