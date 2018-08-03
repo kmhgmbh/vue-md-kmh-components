@@ -6,15 +6,15 @@
       <!-- TABLE HEAD -->
       <tr class="table-header">
         <th v-if="selectable" class="selection-column" :style="dynamicWidth">
-          <mdl-checkbox
-            @change.native="toggleSelectAllRows()"
+          <md-checkbox
+            v-on:change="toggleSelectAllRows()"
             v-model="selectAllRowsFlag">
-          </mdl-checkbox>
+          </md-checkbox>
         </th>
         <th @click="sort(head)" :class="{searchMode: getSearchContainer(id + '_search_container_' + encode(head.key, true)), sortable: !head.keys && sortable}" v-for="head in headData" :key="head.name" v-if="(head.keys && icons) || (!head.keys && !ignore(head.key))" :style="dynamicWidth">
           <div class="head-content md-layout md-alignment-center-center" style="max-width: 100%">
-            <md-icon v-if="sortedAsc(head) && sortable" class="no-selection">arrow_drop_down</md-icon>
-            <md-icon v-else-if="sortedDesc(head) && sortable" class="no-selection">arrow_drop_up</md-icon>
+            <md-icon v-if="isSortedAfter(head.key) === 'DESC' && sortable" class="no-selection">arrow_drop_down</md-icon>
+            <md-icon v-else-if="isSortedAfter(head.key) === 'ASC' && sortable" class="no-selection">arrow_drop_up</md-icon>
             <md-icon v-else-if="!head.keys && sortable" class="no-selection right">arrow_drop_down</md-icon>
             <div v-if="!head.keys" class="headname no-selection">
               <div class="title" :title="head.name">{{ head.name }}</div>
@@ -26,7 +26,7 @@
               </md-field>
             </div>
             <span v-else class="headname no-selection">{{ emptyHead }}</span>
-            <md-icon v-if="!getSearchContainer(id + '_search_container_' + encode(head.key, true)) && !head.keys && search" :id="id + '_search_icon_' + encode(head.key, true)" @click.native.stop.prevent="setSearchContainer(id + '_search_container_' + encode(head.key, true))" class="no-selection search">search</md-icon>
+            <md-icon v-if="!getSearchContainer(id + '_search_container_' + encode(head.key, true)) && !head.keys && search" :id="id + '_search_icon_' + encode(head.key, true)" @click.native.stop.prevent="setSearchContainer(id + '_search_container_' + encode(head.key, true), id + '_search_input_' + encode(head.key, true))" class="no-selection search">search</md-icon>
             <md-icon v-if="getSearchContainer(id + '_search_container_' + encode(head.key, true)) && !head.keys && search" :id="id + '_search_close_' + encode(head.key, true)" @click.native.stop.prevent="clearSearchContainer(id + '_search_container_' + encode(head.key, true), head.key)" class="no-selection search">close</md-icon>
           </div>
         </th>
@@ -50,12 +50,12 @@
       </tr>
 
       <!-- TABLE CONTENT ROWS -->
-      <template v-for="row, rowIndex in (sortedData.length === 0 ? data : sortedData)" v-if="columnFilterMatched(row) && rowOnCurrentPage(rowIndex)">
+      <template v-for="row, rowIndex in rowsToShow">
 
         <!-- ROW -->
-        <tr :id="rowId(rowIndex)" class="table-row" :class="{active: isVisibleBlock(rowIndex) && withBlock, noHover: !withBlock}" :style="dynamicWidth">
+        <tr :key="'row_' + rowIndex" :id="rowId(rowIndex)" class="table-row" :class="{active: isVisibleBlock(rowIndex) && withBlock, noHover: !withBlock}" :style="dynamicWidth">
           <td v-if="selectable" class="selection-column">
-            <mdl-checkbox @change.native="toggleDataRowSelection(row, rowIndex, $event)" v-model="row.$isSelected" :val="rowIndex"></mdl-checkbox>
+            <md-checkbox v-on:change="rowSelectInput($event, row)" v-model="row.$isSelected"></md-checkbox>
           </td>
           <td @click="!column.keys && toggleBlock(rowIndex, row)" v-for="column, columnIndex in headData" :class="{hasIcon: (column.keys && icons)}" :style="dynamicWidth">
 
@@ -64,8 +64,8 @@
             </div>
              <!-- Handle CTA's -->
             <div v-if="column.keys && icons">
-                <md-icon v-for="ikey in column.keys"
-                         key="icon"
+                <md-icon v-for="(ikey, ikeyIndex) in column.keys"
+                         :key="'icon_' + rowIndex + '_' + ikeyIndex"
                          v-if="isActionActive(ikey, row)"
                          @click.native.stop.prevent="triggerCTA(ikey, row)">{{ getIconName(ikey.name, rowIndex) }}</md-icon>
                 <md-icon class="disabled" v-else-if="!isActionHidden(ikey, row)">{{ getIconName(ikey.name, rowIndex) }}</md-icon>
@@ -75,11 +75,11 @@
               <md-icon :class="lensColor(column, row[column.key])">lens</md-icon>
             </div>
             <!-- Format output -->
-            <div v-else-if="column.format">
+            <div v-else-if="column.format && typeof column.format === 'function'">
               {{column.format(row[column.key])}}
             </div>
             <!-- Display data -->
-            <div v-else v-html="highlight(column.key, row[column.key])"></div>
+            <div v-else v-html="highlight(column, row[column.key])"></div>
           </td>
         </tr>
 
@@ -93,7 +93,7 @@
         </transition>
 
       </template>
-      
+
       <tr v-if="data.length === 0">
         <td colspan="100%" class="noData">
           Keine Daten verfügbar
@@ -107,7 +107,7 @@
     <md-button class="grey" :disabled="page <= 1" @click.native="pagerPrev()">
       <md-icon>chevron_left</md-icon>
     </md-button>
-    <md-button v-for="pagenumber in pages" :key="pagenumber" class="grey" :class="{active: pagenumber === page}" @click.native="page = pagenumber">
+    <md-button v-for="pagenumber in pagesToShow" :disabled="pagenumber === '...'" :key="pagenumber" class="grey" :class="{active: pagenumber === page}" @click.native="gotoPage(pagenumber)">
       {{ pagenumber }}
     </md-button>
     <md-button class="grey" :disabled="page >= pages" @click.native="pagerNext()">
