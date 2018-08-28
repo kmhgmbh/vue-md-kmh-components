@@ -3,6 +3,7 @@
 <script>
 import Vue from 'vue'
 import moment from 'moment'
+import uuid from 'uuid'
 
 export default {
   name: 'data-table',
@@ -63,8 +64,8 @@ export default {
   computed: {
     pages () {
       let length = 1
-      if (this.data.length) {
-        length = this.data.length / this.max
+      if (this.rowData.length) {
+        length = this.rowData.length / this.max
         if (length < 1) {
           length = 1
         }
@@ -87,7 +88,7 @@ export default {
     },
 
     shouldPagerBeDisplayed () {
-      return this.pager && !this.isFilterActive && this.data.length
+      return this.pager && this.data.length
     },
   },
 
@@ -97,9 +98,10 @@ export default {
       show: false,
       searchContainer: [],
       searchColumnFilter: [],
-      sortedColumns: [],
+      sortedColumns: new Map(),
       columnCount: 0,
       page: 1,
+      pagesToShow: [],
       sortedData: [],
       visibleBlock: null,
       selectedRows: [],
@@ -112,7 +114,15 @@ export default {
   },
 
   created () {
+    this.rowData = this.data
     this.init()
+  },
+
+  watch: {
+    data() {
+      this.pageRows(this.page - 1)
+      this.addSelectedProp(this.data.filter(row => row.$isSelected === undefined))
+    },
   },
 
   methods: {
@@ -124,23 +134,220 @@ export default {
      */
     init () {
       this.extractColumnsToShow()
-      
+
       this.id = this._uid
       this.columnCount = this.headData.length
 
-      this.data = this.data.map((row) => {
+      this.rowData = this.rowData.map((row) => {
         const newRow = row
         newRow.$isSelected = false
         return newRow
       })
+
+      this.addSelectedProp(this.data);
+
+      this.pageRows(0);
 
       this.$nextTick(() => {
         this.show = true
       })
     },
 
+    addSelectedProp(rows) {
+      this.allRows.concat(rows.map((row) => {
+        const generatedUuid = uuid.v4();
+
+        const newRow = row;
+        const newMapRow = {
+          row: newRow,
+          mutableProps: {
+            isSelected: false,
+          },
+        };
+
+        Object.defineProperty(newRow, '$isSelected', {
+          get: () => {
+            const mapRow = this.rowMap.get(generatedUuid).mutableProps;
+            if (!mapRow.isSelected) {
+              return false;
+            }
+            return mapRow.isSelected;
+          },
+          set: (newValue) => {
+            this.$forceUpdate();
+            this.rowMap.get(generatedUuid).mutableProps.isSelected = newValue;
+          },
+        });
+
+        newRow.mapRef = generatedUuid;
+
+        this.rowMap.set(generatedUuid, newMapRow);
+        return newRow;
+      }));
+    },
+
     noSearchFilter () {
       return this.searchColumnFilter.filter(column => column === '').length === 0
+    },
+
+    gotoPage(pageNum) {
+      this.page = pageNum;
+      this.pageRows(pageNum - 1);
+      this.$forceUpdate();
+    },
+
+    updatePagesToShow() {
+      const pageRange = [];
+
+      const numPages = Math.ceil(this.allRows.length / this.max);
+      const isNextPageInRange = this.page + 1 <= numPages;
+      const isPrevPageInRange = this.page - 1 > 0;
+
+      if (this.page - 2 > 0) {
+        pageRange.push(1);
+        if (this.page - 3 > 0) {
+          pageRange.push('...');
+        }
+      }
+      if (isPrevPageInRange
+        && !isNextPageInRange
+        && this.page - 3 > 0) {
+        pageRange.push(this.page - 2);
+        pageRange.push(this.page - 1);
+      } else if (isPrevPageInRange) {
+        pageRange.push(this.page - 1);
+      }
+      pageRange.push(this.page);
+      if (!isPrevPageInRange
+        && isNextPageInRange
+        && this.page + 3 <= numPages) {
+        pageRange.push(this.page + 1);
+        pageRange.push(this.page + 2);
+      } else if (isNextPageInRange) {
+        pageRange.push(this.page + 1);
+      }
+      if (this.page + 2 <= numPages) {
+        if (this.page + 3 <= numPages) {
+          pageRange.push('...');
+        }
+        pageRange.push(numPages);
+      }
+
+      this.pagesToShow = pageRange;
+    },
+
+    isSortedAfter(key) {
+      return this.sortedColumns.get(key);
+    },
+
+    noSearchFilter() {
+      return this.searchColumnFilter.filter(column => column === '').length === 0;
+    },
+
+    orderRows(rows) {
+      if (!this.sortedColumns.size) {
+        return rows;
+      }
+      return this.orderedRows(rows, {
+        column: this.sortedColumns.keys().next().value,
+        order: this.sortedColumns.values().next().value,
+      });
+    },
+
+    orderedRows(rows, sortSettings = null) {
+      let actualSortSettings = sortSettings;
+      if (!actualSortSettings) {
+        actualSortSettings = {
+          column: this.headData[0].key,
+          order: 'ASC',
+        };
+      }
+
+      let sortReturnLower = -1;
+      let sortReturnHigher = 1;
+      if (actualSortSettings.order === 'DESC') {
+        sortReturnLower = 1;
+        sortReturnHigher = -1;
+      }
+
+      return rows.sort((a, b) => {
+        let valueA = a[actualSortSettings.column];
+        let valueB = b[actualSortSettings.column];
+
+        const dateRegExp = /[0-3]{1}[0-9]{1}\.[0-1]{1}[0-9]{1}\.[0-9]{4}/;
+
+        const isDate = dateRegExp.test(valueA) && dateRegExp.test(valueB);
+
+        if (isDate) {
+          valueA = moment(valueA, 'DD.MM.YYYY').format('YYYY-MM-DD');
+          valueB = moment(valueB, 'DD.MM.YYYY').format('YYYY-MM-DD');
+        } else if (parseFloat(valueA) && parseFloat(valueB)) {
+          valueA = parseFloat(valueA);
+          valueB = parseFloat(valueB);
+        } else if (parseInt(valueA, 10)
+          && parseInt(valueB, 10)) {
+          valueA = parseInt(valueA, 10);
+          valueB = parseInt(valueB, 10);
+        } else {
+          valueA = valueA.toString().toUpperCase();
+          valueB = valueB.toString().toUpperCase();
+        }
+
+        if (valueA < valueB) {
+          return sortReturnLower;
+        }
+        if (valueA > valueB) {
+          return sortReturnHigher;
+        }
+
+        return 0;
+      });
+    },
+
+    searchedRows(rows) {
+      if (this.isFilterActive) {
+        return rows.filter((row) => {
+          return Object.keys(row).reduce((acc, key) => {
+            if (this.searchColumnFilter[key]) {
+              /* eslint-disable */
+              let convertedWildcards = this.searchColumnFilter[key].replace('*', '[\\d\\w]*');
+              convertedWildcards = convertedWildcards.replace('?', '[\\d\\w]');
+              /* eslint-enable */
+              const regex = new RegExp(convertedWildcards, 'i');
+              return regex.test(row[key]) && acc;
+            } else {
+              return acc
+            }
+          }, true);
+        });
+      }
+      return rows;
+    },
+
+    searchedAndOrderedRows(rows) {
+      const searchedRows = this.searchedRows(rows);
+      const orderedRows = this.orderRows(searchedRows);
+
+      return orderedRows;
+    },
+
+    pagedRows(rows, { pageSize, pageNum } = {}) {
+      const startIndex = pageSize * (pageNum);
+      const endIndex = pageSize * (pageNum + 1);
+
+      return this.searchedAndOrderedRows(rows).slice(startIndex, endIndex);
+    },
+
+    pageRows(pageNum) {
+      const rowsClone = this.data.slice(0);
+
+      this.rowsToShow = this.pagedRows(
+        rowsClone,
+        { pageSize: this.max, pageNum }
+      );
+      this.allRows = this.searchedAndOrderedRows(rowsClone);
+      this.$emit('rowsUpdated', this.allRows);
+      this.updatePagesToShow();
     },
 
     /**
@@ -188,7 +395,7 @@ export default {
 
     getIconName (icon, index) {
       if (typeof icon === 'function') {
-        return icon(this.data[index])
+        return icon(this.rowData[index])
       }
       return icon
     },
@@ -229,8 +436,8 @@ export default {
     },
 
     rowId (index) {
-      if (this.data && this.data[0]) {
-        return `${this.data[0].constructor.name}-${index}`
+      if (this.rowData && this.rowData[0]) {
+        return `${this.rowData[0].constructor.name}-${index}`
       }
       return `row-${index}`
     },
@@ -317,6 +524,20 @@ export default {
       return true
     },
 
+    pagerPrev() {
+      if (this.page - 1 > 0) {
+        this.pageRows((this.page - 1) - 1);
+        this.page -= 1;
+      }
+    },
+
+    pagerNext() {
+      if (this.page < (this.allRows.length / this.max)) {
+        this.pageRows(this.page);
+        this.page += 1;
+      }
+    },
+
     rowOnCurrentPage (index) {
       if (this.noSearchFilter()) {
         const max = this.page * this.max
@@ -329,17 +550,23 @@ export default {
       return true
     },
 
-    pagerPrev () {
-      if (this.page > 1) {
-        this.page--
+    toggleSelectAllRows() {
+      let rowsToSelect = this.allRows.slice(0);
+      if (this.selectAllOnlyOnPage) {
+        rowsToSelect = this.rowsToShow.slice(0);
       }
-    },
+      const currentSelectedFlag = this.selectAllRowsFlag;
 
-    pagerNext () {
-      if (this.page < this.pages) {
-        this.page++
-      }
-    },
+      /* eslint-disable */
+      rowsToSelect.forEach((row) => {
+        if (!currentSelectedFlag) {
+          row.$isSelected = true;
+        }
+        if (row.$isSelected !== currentSelectedFlag) {
+          row.$isSelected = currentSelectedFlag;
+        }
+      });
+      /* eslint-enable */
 
     toggleSelectAllRows () {
       this.data = this.data.map((row) => {
@@ -351,13 +578,26 @@ export default {
       this.$emit('rowSelectionChange', this.selectedRowsByIndexKey)
     },
 
+    rowClicked (e) {
+      this.$emit('rowClicked', e)
+    },
+
     getAllSelectedRows () {
-      return this.data.reduce((acc, row) => {
+      return this.rowData.reduce((acc, row) => {
         if (row.$isSelected) {
           acc.push(row[this.selectedRowIndexKey])
         }
         return acc
       }, [])
+    },
+
+    rowSelectInput() {
+      this.selectAllRowsFlag = false;
+
+      if (this.selectedRowIndexKey) {
+        this.selectedRowsByIndexKey = this.getAllSelectedRows();
+        this.$emit('rowSelectionChange', this.selectedRowsByIndexKey);
+      }
     },
 
     toggleDataRowSelection () {
@@ -401,54 +641,51 @@ export default {
       return text
     },
 
-    updateSearchColumnFilter (input, column) {
-      this.searchColumnFilter[column] = input
-      this.isFilterActive = !this.noSearchFilter()
-      this.$forceUpdate()
+    updateSearchColumnFilter(input, column) {
+      if (input === '') {
+        delete this.searchColumnFilter[column];
+      } else {
+        this.searchColumnFilter[column] = input;
+      }
+
+      this.isFilterActive = Object.keys(this.searchColumnFilter).length > 0;
+
+      this.pageRows(0);
     },
 
-    clearSearchContainer (id, column) {
+    clearSearchContainer(id, column) {
       if (this.searchContainer.indexOf(id) > -1) {
-        this.searchContainer.splice(this.searchContainer.indexOf(id), 1)
+        this.searchContainer.splice(this.searchContainer.indexOf(id), 1);
       }
-      this.updateSearchColumnFilter('', column)
+      this.updateSearchColumnFilter('', column);
     },
 
-    getSearchContainer (id) {
-      return this.searchContainer.includes(id)
+    getSearchContainer(id) {
+      return this.searchContainer.includes(id);
     },
 
-    setSearchContainer (id) {
-      this.searchContainer.push(id)
-      this.$forceUpdate()
+    setSearchContainer(id, inputId) {
+      this.searchContainer.push(id);
+      this.$nextTick(() => {
+        document.getElementById(inputId).focus();
+      });
     },
 
-    sortedAsc (head) {
-      if (!head.keys) {
-        if (this.sortedColumns[head.key] === 'ASC') {
-          return true
-        }
-      }
-      return false
+    sortAsc(key) {
+      this.sortedColumns.set(key, 'ASC');
     },
 
-    sortedDesc (head) {
-      if (!head.keys) {
-        if (this.sortedColumns[head.key] === 'DESC') {
-          return true
-        }
-      }
-      return false
+    sortDesc(key) {
+      this.sortedColumns.set(key, 'DESC');
     },
 
-    sort (head) {
-      if (!head.keys && this.sortable) {
-        if (this.sortedAsc(head)) {
-          this.sortedColumns = []
-          this.sortedColumns[head.key] = 'DESC'
-        } else {
-          this.sortedColumns = []
-          this.sortedColumns[head.key] = 'ASC'
+    sort(head) {
+      // quirk as long as the ordering only works for one key
+      const foundSortColumn = this.sortedColumns.get(head.key);
+
+      if (!foundSortColumn) {
+        if (this.sortedColumns.size === 1) {
+          this.sortedColumns.clear();
         }
         if (this.sortedColumns[head.key] !== null) {
           this.sortedData = this.data
@@ -456,25 +693,7 @@ export default {
         }
         this.$forceUpdate()
       }
-    },
-
-    sortData (key, sort) {
-      let sortOrder = 1
-      if (sort === 'DESC') {
-        sortOrder = -1
-      }
-      return (a, b) => {
-        const valueA = typeof a[key] === 'string' && a[key].match(/^[\d]+[.|,]?[\d]+?$/)
-                     ? parseFloat(a[key])
-                     : a[key]
-
-        const valueB = typeof b[key] === 'string' && b[key].match(/^[\d]+[.|,]?[\d]+?$/)
-                     ? parseFloat(b[key])
-                     : b[key]
-
-        const result = (valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0
-        return result * sortOrder
-      }
+      this.pageRows(this.page - 1);
     },
 
     getAncestor (node, tagName) {
