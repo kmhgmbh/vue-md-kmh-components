@@ -64,8 +64,8 @@ export default {
   computed: {
     pages () {
       let length = 1
-      if (this.rowData.length) {
-        length = this.rowData.length / this.max
+      if (this.data.length) {
+        length = this.data.length / this.max
         if (length < 1) {
           length = 1
         }
@@ -96,6 +96,9 @@ export default {
     return {
       id: -1,
       show: false,
+      allRows: [],
+      rowsToShow: [],
+      rowMap: new Map(),
       searchContainer: [],
       searchColumnFilter: [],
       sortedColumns: new Map(),
@@ -114,7 +117,6 @@ export default {
   },
 
   created () {
-    this.rowData = this.data
     this.init()
   },
 
@@ -138,7 +140,7 @@ export default {
       this.id = this._uid
       this.columnCount = this.headData.length
 
-      this.rowData = this.rowData.map((row) => {
+      this.data = this.data.map((row) => {
         const newRow = row
         newRow.$isSelected = false
         return newRow
@@ -395,7 +397,7 @@ export default {
 
     getIconName (icon, index) {
       if (typeof icon === 'function') {
-        return icon(this.rowData[index])
+        return icon(this.data[index])
       }
       return icon
     },
@@ -436,8 +438,8 @@ export default {
     },
 
     rowId (index) {
-      if (this.rowData && this.rowData[0]) {
-        return `${this.rowData[0].constructor.name}-${index}`
+      if (this.data && this.data[0]) {
+        return `${this.data[0].constructor.name}-${index}`
       }
       return `row-${index}`
     },
@@ -568,22 +570,12 @@ export default {
       });
       /* eslint-enable */
 
-    toggleSelectAllRows () {
-      this.data = this.data.map((row) => {
-        const newRow = row
-        newRow.$isSelected = this.selectAllRowsFlag
-        return newRow
-      })
-      this.selectedRowsByIndexKey = this.getAllSelectedRows()
-      this.$emit('rowSelectionChange', this.selectedRowsByIndexKey)
-    },
-
-    rowClicked (e) {
-      this.$emit('rowClicked', e)
+      this.selectedRowsByIndexKey = this.getAllSelectedRows();
+      this.$emit('rowSelectionChange', this.selectedRowsByIndexKey);
     },
 
     getAllSelectedRows () {
-      return this.rowData.reduce((acc, row) => {
+      return this.data.reduce((acc, row) => {
         if (row.$isSelected) {
           acc.push(row[this.selectedRowIndexKey])
         }
@@ -687,11 +679,11 @@ export default {
         if (this.sortedColumns.size === 1) {
           this.sortedColumns.clear();
         }
-        if (this.sortedColumns[head.key] !== null) {
-          this.sortedData = this.data
-          this.sortedData.sort(this.sortData(head.key, this.sortedColumns[head.key]))
-        }
-        this.$forceUpdate()
+        this.sortAsc(head.key);
+      } else if (foundSortColumn === 'DESC') {
+        this.sortAsc(head.key);
+      } else {
+        this.sortDesc(head.key);
       }
       this.pageRows(this.page - 1);
     },

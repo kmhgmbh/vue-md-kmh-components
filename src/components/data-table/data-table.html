@@ -53,7 +53,7 @@
       <template v-for="row, rowIndex in rowsToShow">
 
         <!-- ROW -->
-        <tr :id="rowId(rowIndex)" class="table-row" :class="{active: isVisibleBlock(rowIndex) && withBlock, noHover: !withBlock}" @click.prevent="rowClicked(row)" :style="dynamicWidth">
+        <tr :key="'row_' + rowIndex" :id="rowId(rowIndex)" class="table-row" :class="{active: isVisibleBlock(rowIndex) && withBlock, noHover: !withBlock}" :style="dynamicWidth">
           <td v-if="selectable" class="selection-column">
             <md-checkbox v-on:change="rowSelectInput($event, row)" v-model="row.$isSelected"></md-checkbox>
           </td>
