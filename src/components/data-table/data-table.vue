@@ -575,6 +575,10 @@ export default {
       this.$emit('rowSelectionChange', this.selectedRowsByIndexKey);
     },
 
+    rowClicked (row) {
+      this.$emit('rowClicked', row);
+    },
+
     getAllSelectedRows () {
       return this.data.reduce((acc, row) => {
         if (row.$isSelected) {
