@@ -6,10 +6,17 @@
         :selectable="true"
         selectedRowIndexKey="id"
         :max="maxRows"
-
         ref="birdsTable"
         v-on:rowSelectionChange="selectedRowsChanged"
       >
+
+        <template :slot="'comment_' + value.id" v-for="value in birds">
+          <md-field :key="'comment_' + value.id">
+            <label>Comment</label>
+            <md-input v-model="comment['comment_' + value.id]"></md-input>
+          </md-field>
+        </template>
+
       </VueDatatable>
 
       <md-field>
@@ -35,7 +42,6 @@
         Select All
       </md-button>
 
-    </div>
   </div>
 </template>
 
@@ -64,6 +70,7 @@ export default {
   data() {
     return {
       birds: [],
+      comment: {},
       numBirds: 10,
       maxRows: 10,
       addRowMeta: {
@@ -104,6 +111,11 @@ export default {
         }, {
           key: 'maxAge',
           name: 'Average max age',
+        },
+        {
+          key: 'comment',
+          name: 'Comment',
+          type: 'slot'
         }, /* {
           keys: [
             {
