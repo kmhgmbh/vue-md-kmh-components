@@ -140,10 +140,11 @@ export default {
       this.id = this._uid
       this.columnCount = this.headData.length
 
-      this.data = this.data.map((row) => {
-        const newRow = row
-        newRow.$isSelected = false
-        return newRow
+      this.data.forEach((row, index) => {
+        this.data[index] = Object.assign({
+          $isSelected: false,
+          $class: {}
+        }, row)
       })
 
       this.addSelectedProp(this.data);
@@ -572,6 +573,10 @@ export default {
 
       this.selectedRowsByIndexKey = this.getAllSelectedRows();
       this.$emit('rowSelectionChange', this.selectedRowsByIndexKey);
+    },
+
+    rowClicked (row) {
+      this.$emit('rowClicked', row);
     },
 
     getAllSelectedRows () {
