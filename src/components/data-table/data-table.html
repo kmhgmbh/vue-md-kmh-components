@@ -80,7 +80,7 @@
               {{column.format(row[column.key])}}
             </div>
             <!-- Display slot components -->
-            <div v-else-if="column.type && column.type === 'slot'">
+            <div v-else-if="column.type && column.type === 'slot'" @click.stop="">
               <slot :name="column.key + '_' + row.id"></slot>
             </div>
             <!-- Display data -->

@@ -130,3 +130,5 @@ $ yarn add vue-md-kmh-components
       </md-field>
     </template>
   ```
+
+  ! Attention ! Please make sure every row in the table data has a unique id
