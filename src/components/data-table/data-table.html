@@ -79,6 +79,10 @@
             <div v-else-if="column.format && typeof column.format === 'function'">
               {{column.format(row[column.key])}}
             </div>
+            <!-- Display slot components -->
+            <div v-else-if="column.type && column.type === 'slot'" @click.stop="">
+              <slot :name="column.key + '_' + row.id"></slot>
+            </div>
             <!-- Display data -->
             <div v-else v-html="highlight(column, row[column.key])"></div>
           </td>
