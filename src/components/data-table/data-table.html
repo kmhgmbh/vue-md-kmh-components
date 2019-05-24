@@ -5,13 +5,13 @@
 
       <!-- TABLE HEAD -->
       <tr class="table-header">
-        <th v-if="selectable" class="selection-column" :style="dynamicWidth">
+        <th v-if="selectable" class="selection-column">
           <md-checkbox
             v-on:change="toggleSelectAllRows()"
             v-model="selectAllRowsFlag">
           </md-checkbox>
         </th>
-        <th @click="sort(head)" :class="{searchMode: getSearchContainer(id + '_search_container_' + encode(head.key, true)), sortable: !head.keys && sortable}" v-for="head in headData" :key="head.name" v-if="(head.keys && icons) || (!head.keys && !ignore(head.key))" :style="dynamicWidth">
+        <th @click="sort(head)" :class="{searchMode: getSearchContainer(id + '_search_container_' + encode(head.key, true)), sortable: !head.keys && sortable}" v-for="head in headData" :key="head.name" v-if="(head.keys && icons) || (!head.keys && !ignore(head.key))">
           <div class="head-content md-layout md-alignment-center-center" style="max-width: 100%">
             <md-icon v-if="isSortedAfter(head.key) === 'DESC' && sortable" class="no-selection">arrow_drop_down</md-icon>
             <md-icon v-else-if="isSortedAfter(head.key) === 'ASC' && sortable" class="no-selection">arrow_drop_up</md-icon>
@@ -34,8 +34,8 @@
 
       <!-- TABLE COLUMN SEARCH MOBILE -->
       <tr v-if="search" class="table-row search-row">
-        <td v-if="selectable" :style="dynamicWidth"></td>
-        <td v-for="column, column_index in data[0]" v-if="!ignore(column_index)" :style="dynamicWidth">
+        <td v-if="selectable"></td>
+        <td v-for="column, column_index in data[0]" v-if="!ignore(column_index)">
           <div v-for="head in headData" v-if="head.key === column_index && !ignore(column_index)" :key="head.name + '_mobile'" class="columnHead">
             {{ head.name || emptyHead }}
           </div>
@@ -44,7 +44,7 @@
             <md-input @input="updateSearchColumnFilter($event, column_index)" @propertychange="updateSearchColumnFilter($event, column_index)"></md-input>
           </md-field>
         </td>
-        <td :class="{hasIcon: true, hideMobile: true}" v-for="(head, head_index) in headData" :key="head.name + '_dyn'" v-if="head.keys" :style="dynamicWidth">
+        <td :class="{hasIcon: true, hideMobile: true}" v-for="(head, head_index) in headData" :key="head.name + '_dyn'" v-if="head.keys">
           <div class="columnHead">{{ emptyHead }}</div>
         </td>
       </tr>
@@ -53,12 +53,12 @@
       <template v-for="row, rowIndex in rowsToShow">
 
         <!-- ROW -->
-        <tr :key="'row_' + rowIndex" :id="rowId(rowIndex)" class="table-row" @click.prevent="rowClicked(row)" :style="dynamicWidth"
+        <tr :key="'row_' + rowIndex" :id="rowId(rowIndex)" class="table-row" @click.prevent="rowClicked(row)"
           :class="[row.$class, { active: isVisibleBlock(rowIndex) && withBlock, noHover: !withBlock }]">
           <td v-if="selectable" class="selection-column">
             <md-checkbox v-on:change="rowSelectInput($event, row)" v-model="row.$isSelected"></md-checkbox>
           </td>
-          <td @click="!column.keys && toggleBlock(rowIndex, row)" v-for="column, columnIndex in headData" :class="{hasIcon: (column.keys && icons)}" :style="dynamicWidth">
+          <td @click="!column.keys && toggleBlock(rowIndex, row)" v-for="column, columnIndex in headData" :class="{hasIcon: (column.keys && icons)}">
 
             <div class="columnHead">
               {{ column.name || emptyHead }}

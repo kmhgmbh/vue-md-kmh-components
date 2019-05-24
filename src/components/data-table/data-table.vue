@@ -74,15 +74,6 @@ export default {
       return length
     },
 
-    dynamicWidth () {
-      if (this.$mq.resize && this.$mq.below(600)) {
-        return ''
-      }
-      return {
-        'max-width': `${parseInt((100 / this.columnCount), 10)}%`,
-      }
-    },
-
     withBlock () {
       return !!this.$slots.default
     },
