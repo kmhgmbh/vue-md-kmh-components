@@ -106,3 +106,29 @@ $ yarn add vue-md-kmh-components
       },
     ],
   ```
+
+- vue slots in table columns
+  ```javascript
+    birdsHeadData: [
+      ...
+      {
+        key: 'comment',
+        name: 'Comment',
+        type: 'slot'
+      }
+      ...
+    ],
+  ```
+
+  slotname must be named; columnname + underscore + row index
+
+  ```html
+    <template :slot="'comment_' + value.id" v-for="value in birds">
+      <md-field :key="'comment_' + value.id">
+        <label>Comment</label>
+        <md-input v-model="comment['comment_' + value.id]"></md-input>
+      </md-field>
+    </template>
+  ```
+
+  ! Attention ! Please make sure every row in the table data has a unique id
