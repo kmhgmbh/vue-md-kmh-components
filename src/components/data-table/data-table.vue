@@ -339,6 +339,7 @@ export default {
         rowsClone,
         { pageSize: this.max, pageNum }
       );
+      this.visibleBlock = null;
       this.allRows = this.searchedAndOrderedRows(rowsClone);
       this.$emit('rowsUpdated', this.allRows);
       this.updatePagesToShow();
