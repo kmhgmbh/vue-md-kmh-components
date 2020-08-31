@@ -89,43 +89,46 @@
           @click.prevent="rowClicked(row)"
           :class="[row.$class, { active: isVisibleBlock(rowIndex) && withBlock, noHover: !withBlock }]"
         >
-          <td v-if="selectable" class="selection-column">
-            <md-checkbox v-on:change="rowSelectInput($event, row)" v-model="row.$isSelected"></md-checkbox>
-          </td>
-          <td
-            @click="!column.keys && toggleBlock(rowIndex, row)"
-            v-for="column, columnIndex in headData"
-            :class="{hasIcon: (column.keys && icons)}"
-          >
-            <div class="columnHead">
-              {{ column.name || emptyHead }}
-            </div>
-            <!-- Handle CTA's -->
-            <div v-if="column.keys && icons">
-              <md-icon
-                v-for="(ikey, ikeyIndex) in column.keys"
-                :key="'icon_' + rowIndex + '_' + ikeyIndex"
-                v-if="isActionActive(ikey, row)"
-                @click.native.stop.prevent="triggerCTA(ikey, row)"
-                >{{ getIconName(ikey.name, rowIndex) }}</md-icon
-              >
-              <md-icon class="disabled" v-else-if="!isActionHidden(ikey, row)">{{ getIconName(ikey.name, rowIndex) }}</md-icon>
-            </div>
-            <!-- Handle state flags  -->
-            <div class="onlyState" v-else-if="column.onlyState && column.onlyState === true">
-              <md-icon :class="lensColor(column, row[column.key])">lens</md-icon>
-            </div>
-            <!-- Format output -->
-            <div v-else-if="column.format && typeof column.format === 'function'">
-              {{column.format(row[column.key])}}
-            </div>
-            <!-- Display slot components -->
-            <div v-else-if="column.type && column.type === 'slot'" @click.stop="">
-              <slot :name="column.key + '_' + row.id"></slot>
-            </div>
-            <!-- Display data -->
-            <div v-else v-html="highlight(column, row[column.key])"></div>
-          </td>
+          <!-- Render row content by using the row-slot or use default implementation for compatibility -->
+          <slot name="row" :item="row" :index="rowIndex" :headers="headData">
+            <td v-if="selectable" class="selection-column">
+              <md-checkbox v-on:change="rowSelectInput($event, row)" v-model="row.$isSelected"></md-checkbox>
+            </td>
+            <td
+              @click="!column.keys && toggleBlock(rowIndex, row)"
+              v-for="column, columnIndex in headData"
+              :class="{hasIcon: (column.keys && icons)}"
+            >
+              <div class="columnHead">
+                {{ column.name || emptyHead }}
+              </div>
+              <!-- Handle CTA's -->
+              <div v-if="column.keys && icons">
+                <md-icon
+                  v-for="(ikey, ikeyIndex) in column.keys"
+                  :key="'icon_' + rowIndex + '_' + ikeyIndex"
+                  v-if="isActionActive(ikey, row)"
+                  @click.native.stop.prevent="triggerCTA(ikey, row)"
+                  >{{ getIconName(ikey.name, rowIndex) }}</md-icon
+                >
+                <md-icon class="disabled" v-else-if="!isActionHidden(ikey, row)">{{ getIconName(ikey.name, rowIndex) }}</md-icon>
+              </div>
+              <!-- Handle state flags  -->
+              <div class="onlyState" v-else-if="column.onlyState && column.onlyState === true">
+                <md-icon :class="lensColor(column, row[column.key])">lens</md-icon>
+              </div>
+              <!-- Format output -->
+              <div v-else-if="column.format && typeof column.format === 'function'">
+                {{column.format(row[column.key])}}
+              </div>
+              <!-- Display slot components -->
+              <div v-else-if="column.type && column.type === 'slot'" @click.stop="">
+                <slot :name="column.key + '_' + row.id"></slot>
+              </div>
+              <!-- Display data -->
+              <div v-else v-html="highlight(column, row[column.key])"></div>
+            </td>
+          </slot>
         </tr>
 
         <!-- ROW INNER CONTENT BLOCK -->
