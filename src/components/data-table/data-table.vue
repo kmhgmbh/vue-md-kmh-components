@@ -94,6 +94,7 @@ export default {
       searchColumnFilter: [],
       sortedColumns: new Map(),
       columnCount: 0,
+      pageKeyUnique: 0,
       page: 1,
       pagesToShow: [],
       sortedData: [],
@@ -190,6 +191,13 @@ export default {
       this.$forceUpdate();
     },
 
+    pushPage(pageArr, pageNum) {
+      pageArr.push({
+        key: ++this.pageKeyUnique,
+        pagenumber: pageNum,
+      });
+    },
+
     updatePagesToShow() {
       const pageRange = [];
 
@@ -198,33 +206,33 @@ export default {
       const isPrevPageInRange = this.page - 1 > 0;
 
       if (this.page - 2 > 0) {
-        pageRange.push(1);
+        this.pushPage(pageRange, 1);
         if (this.page - 3 > 0) {
-          pageRange.push('...');
+          this.pushPage(pageRange, '...');
         }
       }
       if (isPrevPageInRange
         && !isNextPageInRange
         && this.page - 3 > 0) {
-        pageRange.push(this.page - 2);
-        pageRange.push(this.page - 1);
+        this.pushPage(pageRange, this.page - 2);
+        this.pushPage(pageRange, this.page - 1);
       } else if (isPrevPageInRange) {
-        pageRange.push(this.page - 1);
+        this.pushPage(pageRange, this.page - 1);
       }
-      pageRange.push(this.page);
+      this.pushPage(pageRange, this.page);
       if (!isPrevPageInRange
         && isNextPageInRange
         && this.page + 3 <= numPages) {
-        pageRange.push(this.page + 1);
-        pageRange.push(this.page + 2);
+        this.pushPage(pageRange, this.page + 1);
+        this.pushPage(pageRange, this.page + 2);
       } else if (isNextPageInRange) {
-        pageRange.push(this.page + 1);
+        this.pushPage(pageRange, this.page + 1);
       }
       if (this.page + 2 <= numPages) {
         if (this.page + 3 <= numPages) {
-          pageRange.push('...');
+          this.pushPage(pageRange, '...');
         }
-        pageRange.push(numPages);
+        this.pushPage(pageRange, numPages);
       }
 
       this.pagesToShow = pageRange;

@@ -22,7 +22,9 @@
     "url": "https://github.com/kmhgmbh/vue-md-kmh-components/issues"
   },
   "homepage": "https://github.com/kmhgmbh/vue-md-kmh-components#readme",
-  "dependencies": {},
+  "dependencies": {
+    "vue-mq": "^1.0.1"
+  },
   "devDependencies": {
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-stage-2": "^6.24.1",
