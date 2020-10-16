@@ -236,7 +236,6 @@ export default {
       }
 
       this.pagesToShow = pageRange;
-      this.$emit('paginated-rows-updated', pageRange);
     },
 
     isSortedAfter(key) {
@@ -348,6 +347,7 @@ export default {
         rowsClone,
         { pageSize: this.max, pageNum }
       );
+      this.$emit('paginated-rows-updated', rowsToShow);
       this.visibleBlock = null;
       this.allRows = this.searchedAndOrderedRows(rowsClone);
       this.$emit('rowsUpdated', this.allRows);
