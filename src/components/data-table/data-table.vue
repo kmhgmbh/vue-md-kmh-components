@@ -236,6 +236,7 @@ export default {
       }
 
       this.pagesToShow = pageRange;
+      this.$emit('paginated-rows-updated', pageRange);
     },
 
     isSortedAfter(key) {
