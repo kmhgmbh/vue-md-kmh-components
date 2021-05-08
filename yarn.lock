@@ -3297,17 +3297,9 @@ lodash.uniq@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.uniq/-/lodash.uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
 
-lodash@^4.0.0, lodash@~4.17.10:
-  version "4.17.10"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.10.tgz#1b7793cf7259ea38fb3661d4d38b3260af8ae4e7"
-
-lodash@^4.14.0, lodash@^4.17.4:
-  version "4.17.4"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
-
-lodash@^4.17.2, lodash@^4.17.3:
-  version "4.17.5"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.5.tgz#99a92d65c0272debe8c96b6057bc8fbfa3bed511"
+lodash@^4.0.0, lodash@^4.14.0, lodash@^4.17.2, lodash@^4.17.3, lodash@^4.17.4, lodash@~4.17.10:
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
 
 loglevel@^1.4.1:
   version "1.6.1"
@@ -5755,7 +5747,7 @@ vue-loader@^13.7.0:
     vue-style-loader "^3.0.0"
     vue-template-es2015-compiler "^1.6.0"
 
-vue-material@^1.0.0-beta-7:
+vue-material@1.0.0-beta-7:
   version "1.0.0-beta-7"
   resolved "https://registry.yarnpkg.com/vue-material/-/vue-material-1.0.0-beta-7.tgz#cd7bbc919d4b43b71d91fafc9b5edad56bdaa327"
   dependencies:
@@ -5774,9 +5766,9 @@ vue-mdl@^1.1.1:
   dependencies:
     focus-trap "^2.1.0"
 
-vue-mq@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/vue-mq/-/vue-mq-0.1.0.tgz#1bcd63a8005a067ef69ce679dd9e989912cda621"
+vue-mq@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/vue-mq/-/vue-mq-1.0.1.tgz#ee7dec5a0f50b4e2edbacd8ed43c57e15a072989"
   dependencies:
     json2mq "^0.2.0"
 
@@ -5798,9 +5790,13 @@ vue-template-es2015-compiler@^1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/vue-template-es2015-compiler/-/vue-template-es2015-compiler-1.6.0.tgz#dc42697133302ce3017524356a6c61b7b69b4a18"
 
-vue@^2.5.13, vue@^2.5.3:
+vue@^2.5.3:
   version "2.5.13"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.5.13.tgz#95bd31e20efcf7a7f39239c9aa6787ce8cf578e1"
+
+vue@^2.6.11:
+  version "2.6.12"
+  resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.12.tgz#f5ebd4fa6bd2869403e29a896aed4904456c9123"
 
 watchpack@^1.4.0:
   version "1.4.0"
